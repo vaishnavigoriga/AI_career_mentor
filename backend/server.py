@@ -205,59 +205,130 @@ Create 5-6 progressive phases that build upon each other. Ensure all URLs are re
         return create_fallback_roadmap(form_data)
 
 def create_fallback_roadmap(form_data: CareerFormInput) -> dict:
-    """Fallback roadmap if AI generation fails"""
+    """Enhanced fallback roadmap if AI generation fails"""
+    career_field = form_data.career_interest.lower()
+    
+    # Customize based on career interest
+    if "ai" in career_field or "ml" in career_field or "data" in career_field:
+        focus_areas_1 = ["Python Programming", "Statistics & Math", "Data Analysis with Pandas"]
+        focus_areas_2 = ["Machine Learning Algorithms", "Data Visualization", "SQL Databases"]
+        projects_1 = "Build a data analysis project using real datasets to understand data cleaning, exploration, and basic visualization techniques."
+        projects_2 = "Create a machine learning model to predict outcomes using supervised learning algorithms like linear regression or decision trees."
+        job_roles = ["Data Analyst", "ML Engineer", "Data Scientist"]
+        companies = ["Google", "Netflix", "Uber", "Airbnb", "Meta"]
+    elif "web" in career_field:
+        focus_areas_1 = ["HTML/CSS Fundamentals", "JavaScript Basics", "Version Control (Git)"]
+        focus_areas_2 = ["React Framework", "Backend Development", "Database Integration"]
+        projects_1 = "Create a responsive personal portfolio website using HTML, CSS, and JavaScript with modern design principles."
+        projects_2 = "Build a full-stack web application with React frontend and Node.js backend, including user authentication."
+        job_roles = ["Frontend Developer", "Full-Stack Developer", "Web Developer"]
+        companies = ["Shopify", "Stripe", "Vercel", "Netlify", "GitHub"]
+    else:
+        focus_areas_1 = ["Technical Fundamentals", "Industry Knowledge", "Communication Skills"]
+        focus_areas_2 = ["Advanced Concepts", "Project Experience", "Professional Development"]
+        projects_1 = "Complete a foundational project in your field to demonstrate core competencies and technical understanding."
+        projects_2 = "Develop an intermediate-level project that showcases problem-solving skills and practical application."
+        job_roles = ["Entry-Level Specialist", "Junior Consultant", "Associate"]
+        companies = ["Accenture", "Deloitte", "IBM", "Cisco", "Oracle"]
+    
     return {
         "roadmap": [
             {
-                "phase": "Months 1-3",
-                "focus_areas": ["Foundation Building", "Basic Skills", "Environment Setup"],
+                "phase": "Months 1-2: Foundation Building",
+                "focus_areas": focus_areas_1,
                 "learning_resources": [
                     {
-                        "title": "Getting Started Guide",
-                        "type": "article",
-                        "url": "https://www.freecodecamp.org"
+                        "title": "FreeCodeCamp Curriculum",
+                        "type": "course",
+                        "url": "https://www.freecodecamp.org/learn"
                     },
                     {
-                        "title": "Basic Programming Course",
-                        "type": "course",
-                        "url": "https://www.coursera.org"
+                        "title": "Coursera Beginner Course",
+                        "type": "course", 
+                        "url": "https://www.coursera.org/browse"
+                    },
+                    {
+                        "title": "YouTube Learning Playlist",
+                        "type": "video",
+                        "url": "https://www.youtube.com/results?search_query=beginner+tutorial"
                     }
                 ],
                 "projects": [
                     {
-                        "title": "Hello World Project",
-                        "description": "Create your first project to get familiar with development environment",
+                        "title": "Foundation Project",
+                        "description": projects_1,
                         "difficulty": "Beginner"
                     }
                 ]
             },
             {
-                "phase": "Months 4-6",
-                "focus_areas": ["Intermediate Concepts", "Project Building", "Problem Solving"],
+                "phase": "Months 3-4: Skill Development", 
+                "focus_areas": focus_areas_2,
                 "learning_resources": [
                     {
-                        "title": "Advanced Tutorials",
-                        "type": "video",
-                        "url": "https://www.youtube.com"
+                        "title": "Udemy Advanced Course",
+                        "type": "course",
+                        "url": "https://www.udemy.com"
+                    },
+                    {
+                        "title": "GitHub Learning Resources",
+                        "type": "article",
+                        "url": "https://github.com/topics"
+                    },
+                    {
+                        "title": "Medium Technical Articles",
+                        "type": "article", 
+                        "url": "https://medium.com/topic/programming"
                     }
                 ],
                 "projects": [
                     {
-                        "title": "Portfolio Project",
-                        "description": "Build a project to showcase your skills",
+                        "title": "Intermediate Portfolio Project",
+                        "description": projects_2,
                         "difficulty": "Intermediate"
+                    }
+                ]
+            },
+            {
+                "phase": "Months 5-6: Advanced Application",
+                "focus_areas": ["Advanced Skills", "Industry Best Practices", "Professional Networking"],
+                "learning_resources": [
+                    {
+                        "title": "Pluralsight Learning Path",
+                        "type": "course",
+                        "url": "https://www.pluralsight.com"
+                    },
+                    {
+                        "title": "Industry Documentation",
+                        "type": "article",
+                        "url": "https://developer.mozilla.org"
+                    }
+                ],
+                "projects": [
+                    {
+                        "title": "Capstone Project",
+                        "description": "Create a comprehensive project that demonstrates mastery of multiple skills and can serve as a portfolio centerpiece for job applications.",
+                        "difficulty": "Advanced"
                     }
                 ]
             }
         ],
-        "job_roles": ["Junior Developer", "Entry-level Analyst", "Technical Intern"],
-        "example_companies": ["Google", "Microsoft", "Amazon"],
+        "job_roles": job_roles,
+        "example_companies": companies,
         "interview_prep": {
-            "important_topics": ["Basic Concepts", "Problem Solving", "Communication Skills"],
+            "important_topics": ["Technical Skills Assessment", "Problem Solving", "Communication", "Industry Knowledge", "Project Discussion"],
             "resources": [
                 {
-                    "title": "Interview Preparation Guide",
-                    "url": "https://www.leetcode.com"
+                    "title": "LeetCode Practice",
+                    "url": "https://leetcode.com"
+                },
+                {
+                    "title": "InterviewBit Preparation",
+                    "url": "https://www.interviewbit.com"
+                },
+                {
+                    "title": "Glassdoor Interview Experiences",
+                    "url": "https://www.glassdoor.com"
                 }
             ]
         }
