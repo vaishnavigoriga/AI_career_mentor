@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { BrowserRouter, Routes, Route, useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 import "./App.css";
@@ -9,9 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from ".
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./components/ui/card";
 import { Badge } from "./components/ui/badge";
 import { Progress } from "./components/ui/progress";
-import { ArrowRight, BookOpen, Video, FileText, ExternalLink, Download, Sparkles, Target, Users, TrendingUp } from "lucide-react";
-import jsPDF from 'jspdf';
-import html2canvas from 'html2canvas';
+import { ArrowRight, BookOpen, Video, FileText, ExternalLink, Download, Sparkles, Target, Users, TrendingUp, Menu, X, CheckCircle, Star, Clock, Award, Briefcase, Zap, Globe, Code, Palette, BarChart3, Cpu, Shield, Smartphone } from "lucide-react";
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
