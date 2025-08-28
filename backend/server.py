@@ -320,14 +320,17 @@ def create_fallback_roadmap(form_data: CareerFormInput) -> dict:
             "resources": [
                 {
                     "title": "LeetCode Practice",
+                    "type": "course",
                     "url": "https://leetcode.com"
                 },
                 {
                     "title": "InterviewBit Preparation",
+                    "type": "course",
                     "url": "https://www.interviewbit.com"
                 },
                 {
                     "title": "Glassdoor Interview Experiences",
+                    "type": "article",
                     "url": "https://www.glassdoor.com"
                 }
             ]
