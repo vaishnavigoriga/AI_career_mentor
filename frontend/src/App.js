@@ -14,14 +14,34 @@ import { ArrowRight, BookOpen, Video, FileText, ExternalLink, Download, Sparkles
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
 
+// Predefined Skills Data
+const SKILL_CATEGORIES = {
+  "Programming": ["Python", "JavaScript", "Java", "C++", "React", "Node.js", "PHP", "Ruby", "Go", "Rust"],
+  "Data & AI": ["Machine Learning", "Data Analysis", "SQL", "TensorFlow", "PyTorch", "Pandas", "R", "Statistics", "Deep Learning"],
+  "Design": ["UI/UX Design", "Figma", "Adobe Photoshop", "Adobe Illustrator", "Sketch", "Prototyping", "User Research", "Wireframing"],
+  "Business": ["Project Management", "Marketing", "Sales", "Business Analysis", "Strategy", "Leadership", "Communication", "Negotiation"],
+  "Cloud & DevOps": ["AWS", "Azure", "Docker", "Kubernetes", "CI/CD", "Linux", "Git", "Jenkins", "Terraform"],
+  "Mobile": ["React Native", "Flutter", "Swift", "Kotlin", "iOS Development", "Android Development", "Cross-platform"],
+  "Other": ["Cybersecurity", "Blockchain", "Game Development", "AR/VR", "IoT", "Testing", "Technical Writing"]
+};
+
 // Landing Page Component
 const LandingPage = () => {
   const navigate = useNavigate();
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const featuresRef = useRef(null);
+  const howItWorksRef = useRef(null);
+  const aboutRef = useRef(null);
+
+  const scrollToSection = (ref) => {
+    ref.current?.scrollIntoView({ behavior: 'smooth' });
+    setMobileMenuOpen(false);
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
-      {/* Navigation */}
-      <nav className="bg-white/80 backdrop-blur-md border-b border-slate-200/50 sticky top-0 z-50">
+      {/* Enhanced Navigation */}
+      <nav className="bg-white/90 backdrop-blur-md border-b border-slate-200/50 sticky top-0 z-50">
         <div className="max-w-6xl mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
@@ -30,14 +50,62 @@ const LandingPage = () => {
               </div>
               <span className="text-xl font-bold text-slate-800">AI Career Mentor</span>
             </div>
-            <Button 
-              onClick={() => navigate('/form')}
-              className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-6 py-2 rounded-full font-medium transition-all duration-300 hover:shadow-lg hover:scale-105"
-            >
-              Get Started
-              <ArrowRight className="w-4 h-4 ml-2" />
-            </Button>
+
+            {/* Desktop Navigation */}
+            <div className="hidden md:flex items-center space-x-8">
+              <button onClick={() => scrollToSection(aboutRef)} className="text-slate-600 hover:text-blue-600 transition-colors">
+                About
+              </button>
+              <button onClick={() => scrollToSection(featuresRef)} className="text-slate-600 hover:text-blue-600 transition-colors">
+                Features
+              </button>
+              <button onClick={() => scrollToSection(howItWorksRef)} className="text-slate-600 hover:text-blue-600 transition-colors">
+                How It Works
+              </button>
+              <Button 
+                onClick={() => navigate('/form')}
+                className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-6 py-2 rounded-full font-medium transition-all duration-300 hover:shadow-lg hover:scale-105"
+              >
+                Get Started
+                <ArrowRight className="w-4 h-4 ml-2" />
+              </Button>
+            </div>
+
+            {/* Mobile Menu Button */}
+            <div className="md:hidden">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              >
+                {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+              </Button>
+            </div>
           </div>
+
+          {/* Mobile Navigation Menu */}
+          {mobileMenuOpen && (
+            <div className="md:hidden absolute top-full left-0 right-0 bg-white/95 backdrop-blur-md border-b border-slate-200/50 py-4">
+              <div className="flex flex-col space-y-4 px-6">
+                <button onClick={() => scrollToSection(aboutRef)} className="text-left text-slate-600 hover:text-blue-600 transition-colors">
+                  About
+                </button>
+                <button onClick={() => scrollToSection(featuresRef)} className="text-left text-slate-600 hover:text-blue-600 transition-colors">
+                  Features
+                </button>
+                <button onClick={() => scrollToSection(howItWorksRef)} className="text-left text-slate-600 hover:text-blue-600 transition-colors">
+                  How It Works
+                </button>
+                <Button 
+                  onClick={() => navigate('/form')}
+                  className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white"
+                >
+                  Get Started
+                  <ArrowRight className="w-4 h-4 ml-2" />
+                </Button>
+              </div>
+            </div>
+          )}
         </div>
       </nav>
 
