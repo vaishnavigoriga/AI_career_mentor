@@ -86,51 +86,105 @@ async def generate_career_roadmap(form_data: CareerFormInput) -> dict:
             system_message="You are an expert career mentor that creates comprehensive career roadmaps. You must respond only with valid JSON in the exact format requested, no additional text or explanations."
         ).with_model("openai", "gpt-4o")
         
-        # Create the prompt
+        # Create the enhanced prompt for better roadmaps
         prompt = f"""
-Create a detailed career roadmap for a student with the following profile:
-- Degree: {form_data.degree}
-- Year: {form_data.year}
+Create a comprehensive, actionable career roadmap for a student with the following profile:
+- Degree/Field: {form_data.degree}
+- Academic Year: {form_data.year}
 - Current Skills: {form_data.skills}
-- Career Interest: {form_data.career_interest}
-- Learning Style: {form_data.learning_style}
+- Target Career: {form_data.career_interest}
+- Learning Preference: {form_data.learning_style}
 
-Respond ONLY with valid JSON in this exact structure (no additional text):
+Generate a detailed 12-18 month roadmap with 5-6 phases. Each phase should be 2-3 months long with clear, actionable goals.
+
+IMPORTANT GUIDELINES:
+1. Use REAL, working URLs from these trusted sources:
+   - Coursera.org, Udemy.com, edX.org for courses
+   - YouTube.com for video tutorials
+   - GitHub.com for code examples
+   - FreeCodeCamp.org for free programming content
+   - Kaggle.com for data science projects
+   - Medium.com for articles
+   - Pluralsight.com for tech training
+   - AWS, Google Cloud, Azure official documentation
+
+2. Focus areas should be specific, measurable skills
+3. Projects should build progressively in complexity
+4. Include both FREE and PAID resources clearly labeled
+5. Make learning paths realistic and time-bound
+
+Respond ONLY with valid JSON in this exact structure:
 {{
   "roadmap": [
     {{
-      "phase": "Months 1-3",
-      "focus_areas": ["specific skill 1", "specific skill 2", "specific skill 3"],
+      "phase": "Months 1-2: Foundation Building",
+      "focus_areas": ["Specific skill with measurable outcome", "Another concrete skill", "Third focused area"],
       "learning_resources": [
         {{
-          "title": "Resource Name",
-          "type": "video/book/course/article",
-          "url": "https://actual-working-url.com"
+          "title": "Specific Course/Resource Name",
+          "type": "course",
+          "url": "https://coursera.org/learn/example-course"
+        }},
+        {{
+          "title": "YouTube Tutorial Series Name", 
+          "type": "video",
+          "url": "https://youtube.com/watch?v=example"
+        }},
+        {{
+          "title": "Free Resource Title",
+          "type": "article", 
+          "url": "https://freecodecamp.org/news/example"
         }}
       ],
       "projects": [
         {{
-          "title": "Project Name",
-          "description": "Detailed description",
-          "difficulty": "Beginner/Intermediate/Advanced"
+          "title": "Descriptive Project Name",
+          "description": "Detailed description with specific technologies, expected outcomes, and key learning objectives. Mention estimated time to complete.",
+          "difficulty": "Beginner"
+        }}
+      ]
+    }},
+    {{
+      "phase": "Months 3-4: Skill Development",
+      "focus_areas": ["Next level skill 1", "Intermediate skill 2", "Practical application skill 3"],
+      "learning_resources": [
+        {{
+          "title": "Advanced Course Name",
+          "type": "course",
+          "url": "https://udemy.com/course/example"
+        }}
+      ],
+      "projects": [
+        {{
+          "title": "Intermediate Project Name", 
+          "description": "More complex project building on previous knowledge. Include specific features to implement and technologies to use.",
+          "difficulty": "Intermediate"
         }}
       ]
     }}
   ],
-  "job_roles": ["Role 1", "Role 2", "Role 3"],
-  "example_companies": ["Company 1", "Company 2", "Company 3"],
+  "job_roles": ["Entry Level Position", "Mid-Level Role", "Senior Position"],
+  "example_companies": ["Major Tech Company", "Growing Startup", "Enterprise Corporation", "Consulting Firm", "Remote-First Company"],
   "interview_prep": {{
-    "important_topics": ["Topic 1", "Topic 2", "Topic 3"],
+    "important_topics": ["Technical Concept 1", "Practical Skill 2", "Industry Knowledge 3", "Soft Skill 4", "Problem Solving 5"],
     "resources": [
       {{
-        "title": "Resource Name",
-        "url": "https://actual-working-url.com"
+        "title": "Interview Preparation Platform",
+        "url": "https://leetcode.com"
+      }},
+      {{
+        "title": "System Design Resource",
+        "url": "https://github.com/donnemartin/system-design-primer"
+      }},
+      {{
+        "title": "Behavioral Interview Guide",
+        "url": "https://medium.com/@example-behavioral-prep"
       }}
     ]
   }}
 }}
 
-Include both free and paid resources. Make the roadmap comprehensive with 4-6 phases covering 12-18 months. Use real URLs whenever possible.
+Create 5-6 progressive phases that build upon each other. Ensure all URLs are real and accessible. Focus on {form_data.career_interest} career path with {form_data.learning_style} learning approach.
 """
         
         # Send message to LLM
