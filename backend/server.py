@@ -1,4 +1,4 @@
-from fastapi import FastAPI, APIRouter
+from fastapi import FastAPI, APIRouter, HTTPException
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
@@ -6,10 +6,11 @@ import os
 import logging
 from pathlib import Path
 from pydantic import BaseModel, Field
-from typing import List
+from typing import List, Optional
 import uuid
 from datetime import datetime
-
+from emergentintegrations.llm.chat import LlmChat, UserMessage
+import json
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
@@ -25,8 +26,48 @@ app = FastAPI()
 # Create a router with the /api prefix
 api_router = APIRouter(prefix="/api")
 
+# LLM Configuration
+EMERGENT_LLM_KEY = os.environ.get('EMERGENT_LLM_KEY')
 
 # Define Models
+class CareerFormInput(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    degree: str
+    year: str
+    skills: str
+    career_interest: str
+    learning_style: str
+    timestamp: datetime = Field(default_factory=datetime.utcnow)
+
+class LearningResource(BaseModel):
+    title: str
+    type: str
+    url: str
+
+class Project(BaseModel):
+    title: str
+    description: str
+    difficulty: str
+
+class Phase(BaseModel):
+    phase: str
+    focus_areas: List[str]
+    learning_resources: List[LearningResource]
+    projects: List[Project]
+
+class InterviewPrep(BaseModel):
+    important_topics: List[str]
+    resources: List[LearningResource]
+
+class CareerRoadmap(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    form_id: str
+    roadmap: List[Phase]
+    job_roles: List[str]
+    example_companies: List[str]
+    interview_prep: InterviewPrep
+    timestamp: datetime = Field(default_factory=datetime.utcnow)
+
 class StatusCheck(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     client_name: str
@@ -35,10 +76,189 @@ class StatusCheck(BaseModel):
 class StatusCheckCreate(BaseModel):
     client_name: str
 
+# Helper function to generate career roadmap
+async def generate_career_roadmap(form_data: CareerFormInput) -> dict:
+    try:
+        # Initialize LLM Chat
+        chat = LlmChat(
+            api_key=EMERGENT_LLM_KEY,
+            session_id=f"career_mentor_{form_data.id}",
+            system_message="You are an expert career mentor that creates comprehensive career roadmaps. You must respond only with valid JSON in the exact format requested, no additional text or explanations."
+        ).with_model("openai", "gpt-4o")
+        
+        # Create the prompt
+        prompt = f"""
+Create a detailed career roadmap for a student with the following profile:
+- Degree: {form_data.degree}
+- Year: {form_data.year}
+- Current Skills: {form_data.skills}
+- Career Interest: {form_data.career_interest}
+- Learning Style: {form_data.learning_style}
+
+Respond ONLY with valid JSON in this exact structure (no additional text):
+{{
+  "roadmap": [
+    {{
+      "phase": "Months 1-3",
+      "focus_areas": ["specific skill 1", "specific skill 2", "specific skill 3"],
+      "learning_resources": [
+        {{
+          "title": "Resource Name",
+          "type": "video/book/course/article",
+          "url": "https://actual-working-url.com"
+        }}
+      ],
+      "projects": [
+        {{
+          "title": "Project Name",
+          "description": "Detailed description",
+          "difficulty": "Beginner/Intermediate/Advanced"
+        }}
+      ]
+    }}
+  ],
+  "job_roles": ["Role 1", "Role 2", "Role 3"],
+  "example_companies": ["Company 1", "Company 2", "Company 3"],
+  "interview_prep": {{
+    "important_topics": ["Topic 1", "Topic 2", "Topic 3"],
+    "resources": [
+      {{
+        "title": "Resource Name",
+        "url": "https://actual-working-url.com"
+      }}
+    ]
+  }}
+}}
+
+Include both free and paid resources. Make the roadmap comprehensive with 4-6 phases covering 12-18 months. Use real URLs whenever possible.
+"""
+        
+        # Send message to LLM
+        user_message = UserMessage(text=prompt)
+        response = await chat.send_message(user_message)
+        
+        # Parse JSON response
+        try:
+            roadmap_data = json.loads(response)
+            return roadmap_data
+        except json.JSONDecodeError:
+            # Fallback if JSON parsing fails
+            logging.error(f"Failed to parse JSON response: {response}")
+            return create_fallback_roadmap(form_data)
+            
+    except Exception as e:
+        logging.error(f"Error generating roadmap: {str(e)}")
+        return create_fallback_roadmap(form_data)
+
+def create_fallback_roadmap(form_data: CareerFormInput) -> dict:
+    """Fallback roadmap if AI generation fails"""
+    return {
+        "roadmap": [
+            {
+                "phase": "Months 1-3",
+                "focus_areas": ["Foundation Building", "Basic Skills", "Environment Setup"],
+                "learning_resources": [
+                    {
+                        "title": "Getting Started Guide",
+                        "type": "article",
+                        "url": "https://www.freecodecamp.org"
+                    },
+                    {
+                        "title": "Basic Programming Course",
+                        "type": "course",
+                        "url": "https://www.coursera.org"
+                    }
+                ],
+                "projects": [
+                    {
+                        "title": "Hello World Project",
+                        "description": "Create your first project to get familiar with development environment",
+                        "difficulty": "Beginner"
+                    }
+                ]
+            },
+            {
+                "phase": "Months 4-6",
+                "focus_areas": ["Intermediate Concepts", "Project Building", "Problem Solving"],
+                "learning_resources": [
+                    {
+                        "title": "Advanced Tutorials",
+                        "type": "video",
+                        "url": "https://www.youtube.com"
+                    }
+                ],
+                "projects": [
+                    {
+                        "title": "Portfolio Project",
+                        "description": "Build a project to showcase your skills",
+                        "difficulty": "Intermediate"
+                    }
+                ]
+            }
+        ],
+        "job_roles": ["Junior Developer", "Entry-level Analyst", "Technical Intern"],
+        "example_companies": ["Google", "Microsoft", "Amazon"],
+        "interview_prep": {
+            "important_topics": ["Basic Concepts", "Problem Solving", "Communication Skills"],
+            "resources": [
+                {
+                    "title": "Interview Preparation Guide",
+                    "url": "https://www.leetcode.com"
+                }
+            ]
+        }
+    }
+
 # Add your routes to the router instead of directly to app
 @api_router.get("/")
 async def root():
-    return {"message": "Hello World"}
+    return {"message": "AI Career Mentor API is running!"}
+
+@api_router.post("/career-form", response_model=dict)
+async def submit_career_form(input_data: CareerFormInput):
+    try:
+        # Store form data
+        form_dict = input_data.dict()
+        await db.career_forms.insert_one(form_dict)
+        
+        # Generate roadmap using AI
+        roadmap_data = await generate_career_roadmap(input_data)
+        
+        # Create roadmap object
+        roadmap = CareerRoadmap(
+            form_id=input_data.id,
+            **roadmap_data
+        )
+        
+        # Store roadmap
+        roadmap_dict = roadmap.dict()
+        await db.career_roadmaps.insert_one(roadmap_dict)
+        
+        return {
+            "success": True,
+            "form_id": input_data.id,
+            "roadmap_id": roadmap.id,
+            "roadmap": roadmap_data
+        }
+        
+    except Exception as e:
+        logging.error(f"Error in career form submission: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Failed to process career form: {str(e)}")
+
+@api_router.get("/roadmap/{roadmap_id}")
+async def get_roadmap(roadmap_id: str):
+    try:
+        roadmap = await db.career_roadmaps.find_one({"id": roadmap_id})
+        if not roadmap:
+            raise HTTPException(status_code=404, detail="Roadmap not found")
+        
+        # Convert MongoDB document to proper format
+        roadmap.pop('_id', None)  # Remove MongoDB _id field
+        return roadmap
+        
+    except Exception as e:
+        logging.error(f"Error fetching roadmap: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to fetch roadmap")
 
 @api_router.post("/status", response_model=StatusCheck)
 async def create_status_check(input: StatusCheckCreate):
