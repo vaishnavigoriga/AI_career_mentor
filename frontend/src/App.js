@@ -487,6 +487,31 @@ const FormPage = () => {
     learning_style: ''
   });
   const [loading, setLoading] = useState(false);
+  const [selectedSkills, setSelectedSkills] = useState([]);
+  const [customSkill, setCustomSkill] = useState('');
+
+  const handleSkillSelect = (skill) => {
+    if (!selectedSkills.includes(skill)) {
+      const newSkills = [...selectedSkills, skill];
+      setSelectedSkills(newSkills);
+      setFormData({...formData, skills: newSkills.join(', ')});
+    }
+  };
+
+  const removeSkill = (skillToRemove) => {
+    const newSkills = selectedSkills.filter(skill => skill !== skillToRemove);
+    setSelectedSkills(newSkills);
+    setFormData({...formData, skills: newSkills.join(', ')});
+  };
+
+  const addCustomSkill = () => {
+    if (customSkill.trim() && !selectedSkills.includes(customSkill.trim())) {
+      const newSkills = [...selectedSkills, customSkill.trim()];
+      setSelectedSkills(newSkills);
+      setFormData({...formData, skills: newSkills.join(', ')});
+      setCustomSkill('');
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
