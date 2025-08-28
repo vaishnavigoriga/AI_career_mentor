@@ -597,15 +597,102 @@ const FormPage = () => {
                 </Select>
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="skills" className="text-slate-700 font-medium">Current Skills & Experience</Label>
-                <Input
-                  id="skills"
-                  placeholder="e.g., Python, JavaScript, Project Management, Marketing"
-                  value={formData.skills}
-                  onChange={(e) => setFormData({...formData, skills: e.target.value})}
-                  className="border-slate-300 focus:border-blue-500 focus:ring-blue-500"
-                />
+              <div className="space-y-4">
+                <Label className="text-slate-700 font-medium">Current Skills & Experience</Label>
+                
+                {/* Selected Skills Display */}
+                {selectedSkills.length > 0 && (
+                  <div className="space-y-2">
+                    <p className="text-sm text-slate-600">Selected Skills:</p>
+                    <div className="flex flex-wrap gap-2">
+                      {selectedSkills.map((skill, idx) => (
+                        <Badge 
+                          key={idx} 
+                          variant="secondary"
+                          className="bg-blue-100 text-blue-800 border-blue-200 pr-1"
+                        >
+                          {skill}
+                          <button
+                            type="button"
+                            onClick={() => removeSkill(skill)}
+                            className="ml-2 text-blue-600 hover:text-blue-800"
+                          >
+                            <X className="w-3 h-3" />
+                          </button>
+                        </Badge>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Skill Categories */}
+                <div className="space-y-4">
+                  <p className="text-sm text-slate-600">Choose from popular skills or add your own:</p>
+                  
+                  {Object.entries(SKILL_CATEGORIES).map(([category, skills]) => (
+                    <div key={category} className="space-y-2">
+                      <div className="flex items-center space-x-2">
+                        <div className={`w-4 h-4 rounded flex items-center justify-center ${
+                          category === 'Programming' ? 'bg-blue-100' :
+                          category === 'Data & AI' ? 'bg-purple-100' :
+                          category === 'Design' ? 'bg-pink-100' :
+                          category === 'Business' ? 'bg-green-100' :
+                          category === 'Cloud & DevOps' ? 'bg-orange-100' :
+                          category === 'Mobile' ? 'bg-cyan-100' : 'bg-slate-100'
+                        }`}>
+                          {category === 'Programming' && <Code className="w-3 h-3 text-blue-600" />}
+                          {category === 'Data & AI' && <Cpu className="w-3 h-3 text-purple-600" />}
+                          {category === 'Design' && <Palette className="w-3 h-3 text-pink-600" />}
+                          {category === 'Business' && <BarChart3 className="w-3 h-3 text-green-600" />}
+                          {category === 'Cloud & DevOps' && <Zap className="w-3 h-3 text-orange-600" />}
+                          {category === 'Mobile' && <Smartphone className="w-3 h-3 text-cyan-600" />}
+                          {category === 'Other' && <Shield className="w-3 h-3 text-slate-600" />}
+                        </div>
+                        <h4 className="font-medium text-slate-700">{category}</h4>
+                      </div>
+                      <div className="flex flex-wrap gap-2 ml-6">
+                        {skills.map((skill, idx) => (
+                          <button
+                            key={idx}
+                            type="button"
+                            onClick={() => handleSkillSelect(skill)}
+                            disabled={selectedSkills.includes(skill)}
+                            className={`px-3 py-1 text-sm rounded-full border transition-all duration-200 ${
+                              selectedSkills.includes(skill)
+                                ? 'bg-blue-500 text-white border-blue-500 cursor-not-allowed'
+                                : 'bg-slate-50 text-slate-700 border-slate-300 hover:bg-blue-50 hover:border-blue-300 hover:text-blue-700'
+                            }`}
+                          >
+                            {skill}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Custom Skill Input */}
+                <div className="space-y-2">
+                  <Label className="text-slate-700 font-medium">Add Custom Skill</Label>
+                  <div className="flex space-x-2">
+                    <Input
+                      placeholder="Type a custom skill..."
+                      value={customSkill}
+                      onChange={(e) => setCustomSkill(e.target.value)}
+                      onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addCustomSkill())}
+                      className="border-slate-300 focus:border-blue-500 focus:ring-blue-500"
+                    />
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={addCustomSkill}
+                      disabled={!customSkill.trim()}
+                      className="border-slate-300 text-slate-700 hover:bg-slate-50"
+                    >
+                      Add
+                    </Button>
+                  </div>
+                </div>
               </div>
 
               <div className="space-y-2">
